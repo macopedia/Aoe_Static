@@ -13,7 +13,7 @@ class Aoe_Static_Model_Cache_Adapter_Blackhole implements Aoe_Static_Model_Cache
      */
     public function purgeAll()
     {
-        Mage::log('[Aoe_Static Blackhole] Purge all');
+        Mage::helper('aoestatic')->log('[Aoe_Static Blackhole] Purge all');
         return array();
     }
 
@@ -25,7 +25,7 @@ class Aoe_Static_Model_Cache_Adapter_Blackhole implements Aoe_Static_Model_Cache
      */
     public function purge(array $urls)
     {
-        Mage::log('[Aoe_Static Blackhole] Purge urls: ' . implode(', ', $urls));
+        Mage::helper('aoestatic')->log('[Aoe_Static Blackhole] Purge urls: ' . implode(', ', $urls));
         return array();
     }
 
@@ -37,7 +37,7 @@ class Aoe_Static_Model_Cache_Adapter_Blackhole implements Aoe_Static_Model_Cache
      */
     public function purgeTags(array $tags)
     {
-        Mage::log('[Aoe_Static Blackhole] Purge tags: ' . implode(', ', $tags));
+        Mage::helper('aoestatic')->log('[Aoe_Static Blackhole] Purge tags: ' . implode(', ', $tags));
         return array();
     }
 
