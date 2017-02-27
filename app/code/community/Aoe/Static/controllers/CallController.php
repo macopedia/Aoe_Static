@@ -2,9 +2,9 @@
 
 /**
  * CallController
- * Renders the block that are requested via an ajax call
+ * Renders the blocks that are requested via an ajax call
  *
- * @author Fabrizio Branca <fabrizio.branca@aoemedia.de>
+ * @author Fabrizio Branca
  */
 class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action
 {
@@ -46,13 +46,13 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action
      * Index action. This action is called by an ajax request
      *
      * @return void
-     * @author Fabrizio Branca <fabrizio.branca@aoemedia.de>
+     * @author Fabrizio Branca
      */
     public function indexAction()
     {
         // if (!$this->getRequest()->isXmlHttpRequest()) { Mage::throwException('This is not an XmlHttpRequest'); }
         $response = array();
-        $response['sid'] = Mage::getModel('core/session')->getEncryptedSessionId();
+        //$response['sid'] = Mage::getModel('core/session')->getEncryptedSessionId();
 
         if ($currentProductId = $this->getRequest()->getParam('currentProductId')) {
             Mage::getModel('reports/product_index_viewed')

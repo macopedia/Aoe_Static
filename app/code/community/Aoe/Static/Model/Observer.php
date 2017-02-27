@@ -35,6 +35,11 @@ class Aoe_Static_Model_Observer
      */
     public function processPostDispatch(Varien_Event_Observer $observer)
     {
+        //Check if caching is enabled for this dispatch
+        if (!Mage::getSingleton('aoestatic/cache_control')->isEnabled()) {
+            return $this;
+        }
+
         // check if we have messages to display
         $this->messagesToShow = $this->checkForMessages();
 
@@ -54,7 +59,7 @@ class Aoe_Static_Model_Observer
         /* @var $session Mage_Customer_Model_Session */
         if ($session->isLoggedIn()) {
             $loggedIn     = '1';
-            $customerName = Mage::helper('core')->escapeHtml($session->getCustomer()->getName());
+            $customerName = Mage::helper('core')->escapeHtml(trim($session->getCustomer()->getName()));
         }
 
         /** @var Aoe_Static_Model_Cache_Marker $cacheMarker */
@@ -290,8 +295,11 @@ class Aoe_Static_Model_Observer
      * @param Varien_Event_Observer $observer
      */
     public function productOutOfStock($observer) {
-        /** @var $category Mage_CatalogInventory_Model_Stock_Item */
         $stockItem = $observer->getItem();
+        if (! $stockItem instanceof Mage_CatalogInventory_Model_Stock_Item) {
+            return;
+        }
+
         $originalStockData = $stockItem->getOrigData('is_in_stock');
 
         if ((!is_null($originalStockData)
@@ -303,9 +311,9 @@ class Aoe_Static_Model_Observer
             /** @var $helper Aoe_Static_Helper_Data */
             $helper = Mage::helper('aoestatic');
             $tagsToPurge[] = 'product-' . $stockItem->getProductId();
-            $categories = Mage::getModel('catalog/product')->setId($stockItem->getProductId())->getCategoryIds();
-            foreach($categories as $category) {
-                $tagsToPurge[] = 'category-' . $category;
+            $categoryIds = Mage::getModel('catalog/product')->setId($stockItem->getProductId())->getCategoryIds();
+            foreach($categoryIds as $id) {
+                $tagsToPurge[] = 'category-' . $id;
             }
             $helper->purgeTags($tagsToPurge);
         }
@@ -369,7 +377,7 @@ class Aoe_Static_Model_Observer
             if (!empty($errors)) {
                 $this->_addSessionMessage('error', $helper->__("Static Purge failed"));
             } else {
-                $this->_addSessionMessage('success', $helper->__("Static Purge failed"));
+                $this->_addSessionMessage('success', $helper->__("Static Purge succeed"));
             }
 
             return $this;
