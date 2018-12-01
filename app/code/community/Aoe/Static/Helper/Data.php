@@ -93,6 +93,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
         if (!Mage::app()->useCache('aoestatic')) {
             return array();
         }
+        Mage::log('Purging whole varnish', Zend_Log::ERR);
 
         $result = array();
         foreach ($this->_getAdapterInstances() as $adapter) {
