@@ -88,12 +88,20 @@ class Aoe_Static_Model_Cache_Control
             $tags = array($tags);
         }
         $softPurge = Mage::getStoreConfigFlag('dev/aoestatic/xkeySoftPurge');
+        $hasProductTag = false;
         foreach ($tags as $tag) {
             $tag = $this->normalizeTag($tag, !$softPurge);
+            if (strpos($tag, 'PRODUCT')!== false) {
+                $hasProductTag = true;
+            }
             if (!isset($this->_tags[$tag])) {
                 $this->_tags[$tag] = 0;
             }
             $this->_tags[$tag]++;
+        }
+        //add generic tag matching all pages with products
+        if ($hasProductTag && !isset($this->_tags['P'])) {
+            $this->_tags['P'] = 1;
         }
 
         return $this;
