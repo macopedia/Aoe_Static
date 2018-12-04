@@ -87,9 +87,9 @@ class Aoe_Static_Model_Cache_Control
         if (!is_array($tags)) {
             $tags = array($tags);
         }
-
+        $softPurge = Mage::getStoreConfigFlag('dev/aoestatic/xkeySoftPurge');
         foreach ($tags as $tag) {
-            $tag = $this->normalizeTag($tag, true);
+            $tag = $this->normalizeTag($tag, !$softPurge);
             if (!isset($this->_tags[$tag])) {
                 $this->_tags[$tag] = 0;
             }

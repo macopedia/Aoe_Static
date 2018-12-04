@@ -42,7 +42,6 @@ class Aoe_Static_Model_Cache_Adapter_Varnish implements Aoe_Static_Model_Cache_A
     public function purge(array $urls)
     {
         $errors = array();
-
         $regexPatterns = array();
         foreach($urls as $k => $url) {
             if(strpos($url, 'R:') === 0) {
@@ -114,22 +113,29 @@ class Aoe_Static_Model_Cache_Adapter_Varnish implements Aoe_Static_Model_Cache_A
         $curlHandlers = array(); // keep references for clean up
         $multiHandler = curl_multi_init();
 
-        // Tag delimiter
-        $td = str_replace(' ', '\x20', preg_quote(Aoe_Static_Model_Cache_Control::TAG_DELIMITER));
 
-        // Part delimiter
-        $pd = str_replace(' ', '\x20', preg_quote(Aoe_Static_Model_Cache_Control::PART_DELIMITER));
+        $softPurge = Mage::getStoreConfigFlag('dev/aoestatic/xkeySoftPurge');
+        if ($softPurge) {
+            $header = 'xkey-purge: ' . implode(Aoe_Static_Model_Cache_Control::TAG_DELIMITER, $tags);
+        } else {
+            // Tag delimiter
+            $td = str_replace(' ', '\x20', preg_quote(Aoe_Static_Model_Cache_Control::TAG_DELIMITER));
 
-        foreach ($tags as $k => $tag) {
-            if (strpos($tag, 'R:') === 0) {
-                $tag = substr($tag, 2);
-            } else {
-                $tag = preg_quote($tag) . "({$pd}[^{$td}]+)?";
+            // Part delimiter
+            $pd = str_replace(' ', '\x20', preg_quote(Aoe_Static_Model_Cache_Control::PART_DELIMITER));
+
+            foreach ($tags as $k => $tag) {
+                if (strpos($tag, 'R:') === 0) {
+                    $tag = substr($tag, 2);
+                } else {
+                    $tag = preg_quote($tag) . "({$pd}[^{$td}]+)?";
+                }
+                $tags[$k] = $tag;
             }
-            $tags[$k] = $tag;
+            $headerValue = "(?U)(^|{$td})((" . implode(')|(', $tags) . "))($|{$td})";
+            $header = 'X-Tags: ' . $headerValue;
         }
 
-        $regex = "(?U)(^|{$td})((" . implode(')|(', $tags) . "))($|{$td})";
 
         foreach ($this->_varnishServers as $varnishServer) {
             $varnishUrl = "http://" . $varnishServer;
@@ -140,7 +146,7 @@ class Aoe_Static_Model_Cache_Adapter_Varnish implements Aoe_Static_Model_Cache_A
             curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curlHandler, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($curlHandler, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($curlHandler, CURLOPT_HTTPHEADER, array('X-Tags: ' . $regex));
+            curl_setopt($curlHandler, CURLOPT_HTTPHEADER, array($header));
 
             curl_multi_add_handle($multiHandler, $curlHandler);
             $curlHandlers[] = $curlHandler;
