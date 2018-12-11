@@ -87,10 +87,10 @@ class Aoe_Static_Model_Cache_Control
         if (!is_array($tags)) {
             $tags = array($tags);
         }
-        $softPurge = Mage::getStoreConfigFlag('dev/aoestatic/xkeySoftPurge');
+
         $hasProductTag = false;
         foreach ($tags as $tag) {
-            $tag = $this->normalizeTag($tag, !$softPurge);
+            $tag = $this->normalizeTag($tag, true);
             if (strpos($tag, 'PRODUCT')!== false) {
                 $hasProductTag = true;
             }
@@ -117,6 +117,10 @@ class Aoe_Static_Model_Cache_Control
      */
     public function normalizeTag($tag, $withStore = false)
     {
+        $softPurge = Mage::getStoreConfigFlag('dev/aoestatic/xkeySoftPurge');
+        if ($softPurge) {
+            $withStore = false;
+        }
         if(is_array($tag)) {
             $tag = implode(self::PART_DELIMITER, $tag);
         }
