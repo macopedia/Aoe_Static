@@ -157,15 +157,11 @@ class Aoe_Static_Model_Cache_Control
     /**
      * get current category layer
      *
-     * @return Mage_Catalog_Model_Layer
+     * @return Mage_Catalog_Model_Layer | null
      */
     protected function _getLayer()
     {
-        $layer = Mage::registry('current_layer');
-        if ($layer) {
-            return $layer;
-        }
-        return Mage::getSingleton('catalog/layer');
+        return Mage::registry('current_layer');
     }
 
     /**
