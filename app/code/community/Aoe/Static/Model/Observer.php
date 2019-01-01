@@ -85,7 +85,7 @@ class Aoe_Static_Model_Observer
             $this->applyConf($conf, $response);
         }
 
-        if (!$this->messagesToShow) {
+        if (!$this->messagesToShow && property_exists($conf, 'cache') && $conf->cache) {
             /** @var Aoe_Static_Model_Cache_Control $cacheControl */
             $cacheControl = Mage::getSingleton('aoestatic/cache_control');
             $cacheControl->addCustomUrlMaxAge($controllerAction->getRequest());
