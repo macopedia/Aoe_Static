@@ -50,12 +50,15 @@ class Aoe_Static_Model_Observer
         // gather information for replace array
         $customerName = '';
         $loggedIn     = '0';
-        $session      = Mage::getSingleton('customer/session');
-        /* @var $session Mage_Customer_Model_Session */
-        if ($session->isLoggedIn()) {
-            $loggedIn     = '1';
-            $customerName = Mage::helper('core')->escapeHtml($session->getCustomer()->getName());
+
+        if (session_id()) {
+            $session      = Mage::getSingleton('customer/session');
+            if ($session->isLoggedIn()) {
+                $loggedIn     = '1';
+                $customerName = Mage::helper('core')->escapeHtml($session->getCustomer()->getName());
+            }
         }
+
 
         /** @var Aoe_Static_Model_Cache_Marker $cacheMarker */
         $cacheMarker = Mage::getSingleton('aoestatic/cache_marker');
@@ -63,7 +66,7 @@ class Aoe_Static_Model_Observer
             '###FULLACTIONNAME###'      => $fullActionName,
             '###CUSTOMERNAME###'        => $customerName,
             '###ISLOGGEDIN###'          => $loggedIn,
-            '###NUMBEROFITEMSINCART###' => Mage::helper('checkout/cart')->getSummaryCount(),
+            '###NUMBEROFITEMSINCART###' => session_id() ? Mage::helper('checkout/cart')->getSummaryCount() : 0,
         ));
 
         // apply default configuration in any case
@@ -194,6 +197,10 @@ class Aoe_Static_Model_Observer
      */
     protected function checkForMessages()
     {
+        //if there was no session started, we're sure there are no messages to show
+        if (!session_id()) {
+            return $this->messagesToShow;
+        }
         if (
             (false === $this->messagesToShow) &&
             (Mage::app()->getLayout()->getMessagesBlock()->getMessageCollection()->count() > 0)
