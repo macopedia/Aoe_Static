@@ -66,7 +66,6 @@ class Aoe_Static_Model_Observer
             '###FULLACTIONNAME###'      => $fullActionName,
             '###CUSTOMERNAME###'        => $customerName,
             '###ISLOGGEDIN###'          => $loggedIn,
-            '###NUMBEROFITEMSINCART###' => session_id() ? Mage::helper('checkout/cart')->getSummaryCount() : 0,
         ));
 
         // apply default configuration in any case
@@ -465,5 +464,15 @@ class Aoe_Static_Model_Observer
         $handles = array_keys(array_filter($handles));
 
         return $handles;
+    }
+
+    /**
+     * Calculates value for NUMBEROFITEMSINCART marker
+     * Its done here in a callback to avoid calling the code when marker is not used (e.g. in cacheable actions)
+     *
+     * @return float
+     */
+    public function getNumberOfItemsInCart() {
+        return session_id() ? Mage::helper('checkout/cart')->getSummaryCount() : 0.0;
     }
 }

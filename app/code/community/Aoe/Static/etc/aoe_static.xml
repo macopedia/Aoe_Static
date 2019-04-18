@@ -41,11 +41,10 @@
                 <X-Aoestatic-Action>###FULLACTIONNAME###</X-Aoestatic-Action>
             </headers>
             <markers>
-                <!-- Additional markers, here without hashes
-                <MARKERNAMEWITHOUTHASHES>
-                    <valueCallback>some_module/fooclass::getValue</valueCallback>
-                </MARKERNAMEWITHOUTHASHES>
-                -->
+                <!-- Additional markers, here without hashes -->
+                <NUMBEROFITEMSINCART>
+                    <valueCallback>aoestatic/observer::getNumberOfItemsInCart</valueCallback>
+                </NUMBEROFITEMSINCART>
             </markers>
             <handles>
                 <!-- This is to support compatibility with previous behaviour -->
